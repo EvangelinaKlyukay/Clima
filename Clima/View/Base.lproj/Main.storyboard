@@ -110,6 +110,12 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="cityLabel" destination="7u5-YI-0Cr" id="iKi-6l-pXf"/>
+                        <outlet property="conditionImageView" destination="abO-Dm-Xph" id="I7O-be-4gb"/>
+                        <outlet property="searchTexField" destination="FoT-7t-oqM" id="wyO-RT-Leq"/>
+                        <outlet property="temperatureLabel" destination="UX0-Sn-3aB" id="nLY-VV-TZT"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
