@@ -21,14 +21,18 @@ class WeaterViewController: UIViewController {
     let locationManager = CLLocationManager()
     
     override func viewDidLoad() {
-        
+        super.viewDidLoad()
+        locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
         
-        super.viewDidLoad()
-        locationManager.delegate = self
+        
         weatherManager.delegate = self
         searchTexField.delegate = self
+    }
+    
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
     }
 }
 
@@ -46,7 +50,7 @@ extension WeaterViewController: UITextFieldDelegate {
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if textField.text != "" {
             return true
-        }else{
+        } else {
             textField.placeholder = "Type something"
             return false
         }
@@ -63,11 +67,10 @@ extension WeaterViewController: UITextFieldDelegate {
 extension WeaterViewController: WeatherManagerDelegate {
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
         DispatchQueue.main.async {
-            
             self.temperatureLabel.text = weather.temperatureString
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
-        }
-        
+            self.cityLabel.text = weather.cityName
+        } 
     }
     
     func didFailWitchError(error: Error) {
@@ -78,6 +81,7 @@ extension WeaterViewController: WeatherManagerDelegate {
 extension WeaterViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
+            locationManager.stopUpdatingLocation()
             let lat = location.coordinate.latitude
             let lon = location.coordinate.latitude
             weatherManager.fetchWeather(latitude:lat, longitute:lon)
