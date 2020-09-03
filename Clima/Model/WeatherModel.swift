@@ -39,9 +39,4 @@ struct WeatherModel {
             return "cloud"
         }
     }
-    
-//    func getCoditionName(weatherId: Int) -> String {
-//
-//           }
-    
 }
