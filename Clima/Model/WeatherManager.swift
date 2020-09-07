@@ -17,9 +17,8 @@ protocol WeatherManagerDelegate {
 
 class WeatherManager {
     
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=05d22dff3398e1110cf8de7326960bdd&units=metric"
-    
-    var delegate: WeatherManagerDelegate?
+   private let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=05d22dff3398e1110cf8de7326960bdd&units=metric"
+   private let session = URLSession(configuration: .default)
     
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
@@ -34,8 +33,6 @@ class WeatherManager {
     func performRequest(witch urlString: String) {
         
         if let url = URL(string: urlString) {
-            
-            let session = URLSession(configuration: .default)
             
             let task = session.dataTask(with: url) { (data,response, error) in
                 if error != nil {
@@ -59,7 +56,7 @@ class WeatherManager {
         
         do{
             
-            let decodeData = try decoder.decode(WeatherDate.self, from: weatherData)
+            let decodeData = try decoder.decode(WeatherData.self, from: weatherData)
             let id = decodeData.weather[0].id
             let temp = decodeData.main.temp
             let name = decodeData.name
