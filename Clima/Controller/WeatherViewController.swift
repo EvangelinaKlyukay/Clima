@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class WeatherViewController: UIViewController {
+public class WeatherViewController: UIViewController {
     
     
     @IBOutlet weak var conditionImageView: UIImageView!
@@ -17,37 +17,38 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTexField: UITextField!
     
-    var weatherManager = WeatherManager()
-    let locationManager = CLLocationManager()
+    private let weatherManager = WeatherManager()
+    private let locationManager = CLLocationManager()
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
         
-        
         weatherManager.delegate = self
         searchTexField.delegate = self
     }
     
-    @IBAction func locationPressed(_ sender: UIButton) {
-        locationManager.requestLocation()
-    }
+
 }
 
 extension WeatherViewController: UITextFieldDelegate {
+    
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
     
     @IBAction func searchPressed(_ sender: UIButton) {
         searchTexField.endEditing(true)
         
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTexField.endEditing(true)
     }
     
-    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+    public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if textField.text != "" {
             return true
         } else {
@@ -56,7 +57,7 @@ extension WeatherViewController: UITextFieldDelegate {
         }
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
+    public func textFieldDidEndEditing(_ textField: UITextField) {
         if let city = searchTexField.text {
             weatherManager.fetchWeather(cityName: city)
         }
@@ -65,7 +66,7 @@ extension WeatherViewController: UITextFieldDelegate {
 }
 
 extension WeatherViewController: WeatherManagerDelegate {
-    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
+    internal func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
         DispatchQueue.main.async {
             self.temperatureLabel.text = weather.temperatureString
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
@@ -73,29 +74,29 @@ extension WeatherViewController: WeatherManagerDelegate {
         } 
     }
     
-    func didFailWitchError(error: Error) {
+    internal func didFailWitchError(error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .cancel, handler: { _ in
-        NSLog("The \"OK\" alert occured.")
+            NSLog("The \"OK\" alert occured.")
         }))
         self.present(alert, animated: true, completion: nil)
     }
 }
 
 extension WeatherViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             locationManager.stopUpdatingLocation()
             let lat = location.coordinate.latitude
-            let lon = location.coordinate.latitude
+            let lon = location.coordinate.longitude
             weatherManager.fetchWeather(latitude:lat, longitute:lon)
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .cancel, handler: { _ in
-        NSLog("The \"OK\" alert occured.")
+            NSLog("The \"OK\" alert occured.")
         }))
         self.present(alert, animated: true, completion: nil)
     }
