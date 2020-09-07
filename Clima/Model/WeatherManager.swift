@@ -9,12 +9,6 @@
 import Foundation
 import CoreLocation
 
-protocol WeatherManagerDelegate {
-    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
-    func didFailWitchError(error: Error)
-}
-
-
 class WeatherManager {
     
    private let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=05d22dff3398e1110cf8de7326960bdd&units=metric"
@@ -54,7 +48,7 @@ class WeatherManager {
     func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         
-        do{
+        do {
             
             let decodeData = try decoder.decode(WeatherData.self, from: weatherData)
             let id = decodeData.weather[0].id

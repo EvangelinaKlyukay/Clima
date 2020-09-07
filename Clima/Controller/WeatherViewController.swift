@@ -30,10 +30,10 @@ public class WeatherViewController: UIViewController {
         searchTexField.delegate = self
     }
     
-
+    
 }
 
-extension WeatherViewController: UITextFieldDelegate {
+extension WeatherViewController {
     
     @IBAction func locationPressed(_ sender: UIButton) {
         locationManager.requestLocation()
@@ -43,7 +43,9 @@ extension WeatherViewController: UITextFieldDelegate {
         searchTexField.endEditing(true)
         
     }
-    
+}
+
+extension WeatherViewController: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTexField.endEditing(true)
     }
