@@ -7,24 +7,30 @@
 //
 
 import Foundation
-import CoreLocation
+
+protocol WeatherManagerDelegate: class {
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
+    func didFailWitchError(error: Error)
+}
 
 class WeatherManager {
     
    private let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=05d22dff3398e1110cf8de7326960bdd&units=metric"
    private let session = URLSession(configuration: .default)
     
+    weak var delegate: WeatherManagerDelegate?
+    
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
         self.performRequest(witch: urlString)
     }
     
-    func fetchWeather(latitude: CLLocationDegrees, longitute: CLLocationDegrees) {
+    func fetchWeather(latitude: Double, longitute: Double) {
         let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitute)"
         performRequest(witch: urlString)
     }
     
-    func performRequest(witch urlString: String) {
+    private func performRequest(witch urlString: String) {
         
         if let url = URL(string: urlString) {
             
@@ -45,7 +51,7 @@ class WeatherManager {
         }
     }
     
-    func parseJSON(_ weatherData: Data) -> WeatherModel? {
+   private func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         
         do {
