@@ -77,7 +77,7 @@ extension WeatherViewController: WeatherManagerDelegate {
         } 
     }
     
-    func didFailWitchError(error: Error) {
+    func didFailWithError(error: Error) {
          alert(error: error)
     }
 }

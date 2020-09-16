@@ -10,48 +10,70 @@ import Foundation
 
 protocol WeatherManagerDelegate: class {
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
-    func didFailWitchError(error: Error)
+    func didFailWithError(error: Error)
 }
 
 class WeatherManager {
     
-   private let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=05d22dff3398e1110cf8de7326960bdd&units=metric"
-   private let session = URLSession(configuration: .default)
+    private let session = URLSession(configuration: .default)
     
     weak var delegate: WeatherManagerDelegate?
     
+    func makeUrl(q: String?, coords: (lat: Double, lon: Double)?) -> URL? {
+        
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "api.openweathermap.org"
+        components.path = "/data/2.5/weather"
+        components.queryItems = [
+            URLQueryItem(name: "appid", value: "05d22dff3398e1110cf8de7326960bdd"),
+            URLQueryItem(name: "units", value: "metric")
+        ]
+        
+        if let q = q {
+            components.queryItems?.append(URLQueryItem(name: "q", value: q.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)))
+        }
+        
+        if let coords = coords {
+            components.queryItems?.append(URLQueryItem(name: "lat", value: "\(coords.lat)"))
+            components.queryItems?.append(URLQueryItem(name: "lon", value: "\(coords.lon)"))
+        }
+        return components.url
+    }
+    
     func fetchWeather(cityName: String) {
-        let urlString = "\(weatherURL)&q=\(cityName)"
-        self.performRequest(witch: urlString)
+        guard let url = self.makeUrl(q: cityName, coords: nil) else {
+            return
+        }
+        self.performRequest(witch: url)
     }
     
     func fetchWeather(latitude: Double, longitute: Double) {
-        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitute)"
-        performRequest(witch: urlString)
+        guard let url = self.makeUrl(q: nil, coords: (latitude, longitute)) else {
+            return
+        }
+        performRequest(witch: url)
     }
     
-    private func performRequest(witch urlString: String) {
+    private func performRequest(witch url: URL) {
         
-        if let url = URL(string: urlString) {
+        let task = session.dataTask(with: url) { (data,response, error) in
+            if error != nil {
+                self.delegate?.didFailWithError(error: error!)
+                print(error!)
+                return
+            }
             
-            let task = session.dataTask(with: url) { (data,response, error) in
-                if error != nil {
-                    self.delegate?.didFailWitchError(error: error!)
-                    print(error!)
-                    return
-                }
-                
-                if let safeData = data {
-                    if let weather = self.parseJSON(safeData) {
-                        self.delegate?.didUpdateWeather(self, weather: weather)
-                    }
+            if let safeData = data {
+                if let weather = self.parseJSON(safeData) {
+                    self.delegate?.didUpdateWeather(self, weather: weather)
                 }
             }
-            task.resume()
         }
+        task.resume()
     }
     
-   private func parseJSON(_ weatherData: Data) -> WeatherModel? {
+    private func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         
         do {
