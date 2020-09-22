@@ -17,6 +17,7 @@ class WeatherViewController: UIViewController {
     
     private let weatherManager = WeatherManager()
     private let locationService = LocationService()
+    private let userDefaults = UserDefaults()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +25,10 @@ class WeatherViewController: UIViewController {
         locationService.delegate = self
         weatherManager.delegate = self
         searchTexField.delegate = self
+        
+        if let cityName = UserDefaults.cityName {
+           weatherManager.fetchWeather(cityName: cityName)
+        }
     }
     
     private func alert(error: Error) {
@@ -74,6 +79,7 @@ extension WeatherViewController: WeatherManagerDelegate {
             self.temperatureLabel.text = weather.temperatureString
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
             self.cityLabel.text = weather.cityName
+            UserDefaults.cityName = weather.cityName
         } 
     }
     
