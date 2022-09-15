@@ -10,7 +10,7 @@ import Foundation
 import CoreLocation
 
 
-protocol LocationServiceDelegate: class {
+protocol LocationServiceDelegate: AnyObject {
     func didUpdateLocation(lat: Double, lon: Double)
 }
 

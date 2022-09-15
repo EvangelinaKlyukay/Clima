@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol WeatherManagerDelegate: class {
+protocol WeatherManagerDelegate: AnyObject {
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
     func didFailWithError(error: Error)
 }

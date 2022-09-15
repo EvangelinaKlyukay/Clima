@@ -14,6 +14,7 @@ class WeatherViewController: UIViewController {
     @IBOutlet private weak var temperatureLabel: UILabel!
     @IBOutlet private weak var cityLabel: UILabel!
     @IBOutlet private weak var searchTexField: UITextField!
+    @IBOutlet private weak var backgroundView: UIView!
     
     private let weatherManager = WeatherManager()
     private let locationService = LocationService()
@@ -27,8 +28,10 @@ class WeatherViewController: UIViewController {
         searchTexField.delegate = self
         
         if let cityName = UserDefaults.cityName {
-           weatherManager.fetchWeather(cityName: cityName)
+            weatherManager.fetchWeather(cityName: cityName)
         }
+        
+        addGradient()
     }
     
     private func alert(error: Error) {
@@ -37,6 +40,13 @@ class WeatherViewController: UIViewController {
             NSLog("The \"OK\" alert occured.")
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    func addGradient(){
+        let gradient:CAGradientLayer = CAGradientLayer()
+        gradient.frame = view.bounds
+        gradient.colors = [#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1).cgColor, #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1).cgColor]
+        self.backgroundView.layer.addSublayer(gradient)
     }
 }
 
@@ -66,10 +76,15 @@ extension WeatherViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        if let city = searchTexField.text {
-            weatherManager.fetchWeather(cityName: city)
+        
+        guard let cityName = searchTexField.text else { return }
+        let trimmedCityName = cityName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if !trimmedCityName.isEmpty {
+            weatherManager.fetchWeather(cityName: trimmedCityName)
+        } else {
+            searchTexField.text = ""
         }
-        searchTexField.text = ""
     }
 }
 
@@ -80,11 +95,11 @@ extension WeatherViewController: WeatherManagerDelegate {
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
             self.cityLabel.text = weather.cityName
             UserDefaults.cityName = weather.cityName
-        } 
+        }
     }
     
     func didFailWithError(error: Error) {
-         alert(error: error)
+        alert(error: error)
     }
 }
 
